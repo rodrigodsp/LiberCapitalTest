@@ -1,4 +1,5 @@
 require 'prime'
+require 'redis'
 
 class EratosthenesCalculator
     attr_reader :value
@@ -9,7 +10,11 @@ class EratosthenesCalculator
     end
 
     def is_prime_number!
-        primes = Prime::EratosthenesGenerator.new.take_while {|i| i <= value}
-        primes.include?(value)
+        if Rails.cache.read(value).nil?
+            primes = Prime::EratosthenesGenerator.new.take_while {|i| i <= value}
+            Rails.cache.write(value, primes.include?(value))
+        end
+
+        Rails.cache.read(value)
     end
 end

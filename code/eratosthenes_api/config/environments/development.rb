@@ -22,7 +22,8 @@ Rails.application.configure do
   else
     config.action_controller.perform_caching = false
 
-    config.cache_store = :null_store
+    #config.cache_store = :null_store
+    config.cache_store = :redis_cache_store, { url: "redis://localhost:6379/0" }
   end
 
   # Don't care if the mailer can't send.
