@@ -1,5 +1,6 @@
 require 'prime'
 require 'redis'
+require 'bunny'
 
 class EratosthenesCalculator
     attr_reader :value
@@ -10,11 +11,21 @@ class EratosthenesCalculator
     end
 
     def is_prime_number!
-        if Rails.cache.read(value).nil?
-            primes = Prime::EratosthenesGenerator.new.take_while {|i| i <= value}
-            Rails.cache.write(value, primes.include?(value))
-        end
-
+        send_to_queue(value.to_s) if Rails.cache.read(value).nil?
+        
         Rails.cache.read(value)
     end
+
+    def send_to_queue message
+        connection = Bunny.new
+        connection.start
+
+        channel = connection.create_channel
+
+        queue = channel.queue('eratosthenes_queue')
+
+        queue.publish(message, persistent: true)
+        puts " [x] Sent #{message}"
+    end
 end
+
