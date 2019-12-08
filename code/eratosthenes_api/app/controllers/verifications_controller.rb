@@ -1,4 +1,4 @@
-require File.join(Rails.root, "lib", "eratosthenes_calculator")
+require File.join(Rails.root, "lib", "eratosthenes_publisher")
 
 class VerificationsController < ApplicationController
   def prime_numbers
@@ -8,7 +8,7 @@ class VerificationsController < ApplicationController
   protected
 
   def get_results
-    profile_params.fetch(:values).split(',').map{|v| {value: v, prime: EratosthenesCalculator.new(v).is_prime_number!}}
+    profile_params.fetch(:values).split(',').map{|v| {value: v, prime: EratosthenesPublisher.new(v).is_prime_number!}}
   end
 
   def resp_body

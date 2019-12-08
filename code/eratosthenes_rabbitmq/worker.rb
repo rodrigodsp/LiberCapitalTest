@@ -1,31 +1,42 @@
-require 'bunny'
-require 'prime'
+require_relative 'rabbitmq_base'
+
 require 'redis'
+require 'prime'
 
-connection = Bunny.new
-connection.start
-
-channel = connection.create_channel
-
-queue = channel.queue('eratosthenes_queue')
-
-begin
-
+class Worker < RabbitMQBase
+  
+  def start
     puts ' [*] Waiting for messages. To exit press CTRL+C'
 
-    queue.subscribe(block: true) do |delivery_info, _properties, body|
-        puts " [x] Received #{body}"
+    @queue.subscribe(block: true) do |_delivery_info, _properties, body|
+      
+      puts " [x] Received #{body}"
+      
+      params = body.split(' ')
+      
+      if WorkerMethods.public_methods.include?(params[0].to_sym)
+        WorkerMethods.send(params[0], params[1].to_i)
+      else
+        raise 'Método do worker não encontrado!'
+      end
+    end
+  end
 
-        value = body.to_i
+  module WorkerMethods
+    module_function
 
-        primes = Prime::EratosthenesGenerator.new.take_while {|i| i <= value}
+    def is_prime number
+      primes = Prime::EratosthenesGenerator.new.take_while {|i| i <= number}
 
-        redis = Redis.new(host: "localhost")
-        redis.set(value, primes.include?(value))
+      redis = Redis.new(host: redis_host)
+      redis.set(number, primes.include?(number))
     end
 
-rescue Interrupt => _
-    connection.close
+    def redis_host
+      ENV.fetch('REDIS_HOST', 'localhost')
+    end
 
-    exit(0)
+  end
 end
+
+Worker.new.start
