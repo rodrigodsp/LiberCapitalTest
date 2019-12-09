@@ -1,1 +1,90 @@
-Teste para desenvolvedor backend - Implantação - LIBER CAPITAL
+Para subir as aplicações em ambiente de desenvolvimento:
+
+(1) Sem o Docker:
+  
+  (i) Ter as seguintes dependências instaladas:
+    - Ruby 2.6.5
+    - RabbitMQ 3.8.1 (instalação padrão)
+    - Redis 4.0.9 (instalação padrão)
+    
+  (ii) Inicializar o worker do RabbitMQ:
+    - $ cd code/eratosthenes_rabbitmq
+    - $ ruby worker.rb
+    
+  (iii) Inicializar a API REST:
+    - $ cd code/eratosthenes_api
+    - $ rails server
+    
+  (iv) Fazer uma requisição de teste:
+    - $ curl -X POST -d '{"values":"5,6,9,11,12"}' -H "Content-Type: application/json" http://localhost:3000/identify_prime_numbers
+    
+    A primeira requisição deverá ter como retorno algo como o que segue:
+    
+          {
+            "request": {
+                "values": "5,6,9,11,12"
+            },
+            "response": {
+                "numbers": [
+                    {
+                        "value": "5",
+                        "prime": null
+                    },
+                    {
+                        "value": "6",
+                        "prime": null
+                    },
+                    {
+                        "value": "9",
+                        "prime": null
+                    },
+                    {
+                        "value": "11",
+                        "prime": null
+                    },
+                    {
+                        "value": "12",
+                        "prime": null
+                    }
+                ]
+            }
+          }
+          
+    O valor retornado em "prime" para cada um dos "numbers" é null devido ao fato de que na primeira requisição o cache do Redis ainda está limpo, pois os números apenas foram colocados na fila do RabbitMQ para aguardar o processamento. Na segunda requisição, os valores já devem começar a aparecer com "true" para números que são primos e "false" para números que não são:
+          
+          {
+            "request": {
+                "values": "5,6,9,11,12"
+            },
+            "response": {
+                "numbers": [
+                    {
+                        "value": "5",
+                        "prime": true
+                    },
+                    {
+                        "value": "6",
+                        "prime": false
+                    },
+                    {
+                        "value": "9",
+                        "prime": false
+                    },
+                    {
+                        "value": "11",
+                        "prime": true
+                    },
+                    {
+                        "value": "12",
+                        "prime": false
+                    }
+                ]
+            }
+          }
+		  
+  (v) Inicializar o frontend em React:
+	*** AINDA NÃO ESTÁ FUNCIONANDO ***
+	
+	
+(2) Com o Docker:
+*** AINDA NÃO ESTÁ FUNCIONANDO ***
