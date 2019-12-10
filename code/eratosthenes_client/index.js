@@ -1,14 +1,25 @@
 const URL = "http://localhost:3000/identify_prime_numbers";
 
+var intervalId = 0;
+
 document.getElementById('addPostForm').addEventListener('submit', addPost);
 
 function addPost(event) {
     event.preventDefault();
-    
+
+    if(intervalId > 0) {
+        clearInterval(intervalId);
+    }
+
     let values = document.getElementById('values').value;
     let numbers = document.getElementById('numbers');
+    
+    numbers.innerHTML = "<p>Carregando...</p>";
+    
+    intervalId = setInterval(postRequest, 3000, values, numbers);
+}
 
-    numbers.innerHTML = "<p>Carregando...";
+function postRequest(values, numbers) {
     
     const myPost = {
         values: values
