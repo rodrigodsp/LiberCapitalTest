@@ -29,7 +29,7 @@ class Worker < RabbitMQBase
       primes = Prime::EratosthenesGenerator.new.take_while {|i| i <= number}
 
       redis = Redis.new(host: redis_host)
-      redis.set(number, primes.include?(number))
+      redis.set(number, primes.include?(number) ? 'Sim' : 'Não')
     end
 
     def redis_host
