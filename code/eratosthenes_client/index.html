@@ -7,29 +7,38 @@
         <title>Identificador de Números Primos - Crivo de Eratóstenes</title>
         <style>
             table {
-              font-family: arial, sans-serif;
-              border-collapse: collapse;
-              width: 30%;
+                font-family: arial, sans-serif;
+                border-collapse: collapse;
+                width: 30%;
+                margin-left: 35%;
             }
             
             td, th {
-              border: 1px solid black;
-              text-align: center;
-              padding: 8px;
+                border: 1px solid black;
+                text-align: center;
+                padding: 8px;
+            }
+
+            .content {
+                text-align: center;
+                margin: auto;
             }
         </style>
     </head> 
     <body>
-        <h1>Identificador de Números Primos - Crivo de Eratóstenes</h1>
-
-        <form id="addPostForm">
-            <div>
-                <input type="text" id="values" placeholder="Digite aqui uma lista de números separados por vírgula" style="width:320px">
-                <input type="submit" value="Buscar">
-            </div>
+        <div class="content">
+            <h1>Identificador de Números Primos</h1>
+            <h2>Crivo de Eratóstenes</h2>
             <br>
-            <div id="numbers"></div>
-            <script src="index.js"></script>
-        </form>
+            <form id="addPostForm">
+                <div>
+                    <input type="text" id="values" placeholder="Digite aqui uma lista de inteiros separados por vírgula" style="width:320px">
+                    <input type="submit" value="Buscar">
+                </div>
+                <br>
+                <div id="numbers"></div>
+                <script src="index.js"></script>
+            </form>
+        </div>
     </body>   
 </html>
