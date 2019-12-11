@@ -1,4 +1,5 @@
 const URL = "http://localhost:3000/identify_prime_numbers";
+const pattern = new RegExp("^[0-9]+(,[0-9]+)*$");
 
 var intervalId = 0;
 
@@ -13,27 +14,36 @@ function addPost(event) {
 
     let values = document.getElementById('values').value;
     let numbers = document.getElementById('numbers');
-    
-    numbers.innerHTML = "<p>Carregando...</p>";
-    
-    intervalId = setInterval(postRequest, 3000, values, numbers);
+
+    if(pattern.test(values)) {    
+        numbers.innerHTML = "<p>Carregando...</p>";    
+        intervalId = setInterval(postRequest, 3000, values, numbers);
+    } else {
+        alert("Valores inválidos, tente outra vez!\n\nDeve ser fornecida uma lista de valores inteiros\nseparados por vírgula.");
+    }
 }
 
 function postRequest(values, numbers) {
+       
+    if(numbers.innerHTML.indexOf("?") > 0 || numbers.innerHTML.indexOf("Carregando") > 0) {
+        const myPost = {
+            values: values
+        };
+        
+        fetch(URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(myPost)
+        })
+            .then((res) => res.json())
+            .then((data) => numbers.innerHTML = getListOfNumbers(data));
+
+    } else { 
+        clearInterval(intervalId);
+    }
     
-    const myPost = {
-        values: values
-    };
-    
-    fetch(URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(myPost)
-    })
-        .then((res) => res.json())
-        .then((data) => numbers.innerHTML = getListOfNumbers(data));
 }
 
 const getListOfNumbers = (data) => {
