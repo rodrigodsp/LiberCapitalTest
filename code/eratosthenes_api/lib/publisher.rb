@@ -1,12 +1,17 @@
+require_relative 'rabbitmq_base'
+
 require 'prime'
 require 'redis'
 require 'bunny'
+require 'time'
 
-class EratosthenesPublisher
+class Publisher < RabbitMQBase
+    
     attr_reader :value
     private     :value
     
     def initialize(value)
+        super()
         @value = value.to_i
     end
 
@@ -17,15 +22,8 @@ class EratosthenesPublisher
     end
 
     def send_to_queue message
-        connection = Bunny.new(hostname: "localhost")
-        connection.start
-
-        channel = connection.create_channel
-
-        queue = channel.queue('worker_queue')
-
-        queue.publish(message, persistent: true)
-        puts " [x] Sent #{message}"
+        @queue.publish(message, persistent: true)
+        Rails.logger.info("[#{Time.now}] Mensagem \'#{message}\' enviada para o RabbitMQ.")
     end
 end
 

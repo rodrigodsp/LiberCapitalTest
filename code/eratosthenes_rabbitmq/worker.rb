@@ -2,15 +2,18 @@ require_relative 'rabbitmq_base'
 
 require 'redis'
 require 'prime'
+require 'logger'
+require 'time'
 
 class Worker < RabbitMQBase
   
   def start
-    puts ' [*] Waiting for messages. To exit press CTRL+C'
+    logger = Logger.new(STDOUT)
+    logger.info("[#{Time.now}] RabbitMQ aguardando por mensagens.")
 
     @queue.subscribe(block: true) do |_delivery_info, _properties, body|
       
-      puts " [x] Received #{body}"
+      logger.info("[#{Time.now}] Mensagem \'#{body}\' recebida pelo RabbitMQ.")
       
       params = body.split(' ')
       
