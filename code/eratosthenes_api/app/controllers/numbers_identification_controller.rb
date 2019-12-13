@@ -2,7 +2,7 @@ require File.join(Rails.root, "lib", "publisher")
 
 require 'time'
 
-class VerificationsController < ApplicationController
+class NumbersIdentificationController < ApplicationController
   def prime_numbers
     Rails.logger.info("[#{Time.now}] Recebida requisição POST /identify_prime_numbers.")
     render json: resp_body
@@ -27,6 +27,6 @@ class VerificationsController < ApplicationController
   end
 
   def profile_params
-    params.permit(:values)
+    params.permit(:values, numbers_identification: [:values])
   end
 end
