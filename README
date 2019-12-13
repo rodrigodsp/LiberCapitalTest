@@ -82,8 +82,9 @@ Para subir as aplicações em ambiente de desenvolvimento:
             }
           }
 		  
-  (v) Inicializar o frontend em React:
-	*** AINDA NÃO ESTÁ FUNCIONANDO ***
+  (v) Inicializar e testar o frontend em HTML:
+    - Abrir no browser o arquivo 'index.html' contido no diretório 'code/eratosthenes_api'
+    - Digitar no campo texto uma sequência de números inteiros separados por vírgula e clicar no botão 'Buscar'
 	
 	
 (2) Com o Docker:
