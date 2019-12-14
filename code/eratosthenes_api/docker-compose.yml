@@ -1,20 +1,21 @@
 version: '3'
 services:
-
-  redis:
-    image: redis:latest
-    command: redis-server
-    network_mode: "bridge"
-
   api:
-    depends_on:
-      - 'redis'
     build: .
-    ports:
-      - '3000:3000'
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
-      - '.:/app'
-
-volumes:
-  esdata:
-    driver: local
+      - .:/myapp
+    ports:
+      - "3000:3000"
+    networks:
+      - dockernet
+    environment:
+      - RABBITMQ_HOST=192.168.0.1
+      - RABBITMQ_USER=libercapital
+      - RABBITMQ_PASSWD=t0ps3kret
+      - RABBITMQ_VHOST=libercapital
+      - QUEUE_NAME=worker_queue
+      - REDIS_HOST=192.168.0.1
+networks:
+  dockernet:
+      external: true

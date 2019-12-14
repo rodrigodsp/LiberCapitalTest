@@ -1,27 +1,19 @@
 version: '3'
 services:
-
-  rabbitmq:
-    image: rabbitmq:latest
-    ports:
-      - "5672:5672"
-    network_mode: "bridge"
-
-  app_worker:
+  worker:
     build:
       context: .
       dockerfile: Dockerfile
     command: ruby /app/worker.rb
-    deploy:
-      mode: replicated
-      replicas: 3
+    networks:
+      - dockernet
     environment:
-      - RABBITMQ_HOST=localhost
+      - RABBITMQ_HOST=192.168.0.1
+      - RABBITMQ_USER=libercapital
+      - RABBITMQ_PASSWD=t0ps3kret
+      - RABBITMQ_VHOST=libercapital
       - QUEUE_NAME=worker_queue
-      - REDIS_HOST=localhost
-    depends_on:
-      - rabbitmq
-
-volumes:
-  esdata:
-    driver: local
+      - REDIS_HOST=192.168.0.1
+networks:
+  dockernet:
+      external: true

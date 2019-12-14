@@ -16,7 +16,7 @@ class RabbitMQBase
   protected
 
   def create_connection
-    @connection = Bunny.new(hostname: rabbitmq_host)
+    @connection = Bunny.new(hostname: rabbitmq_host, user: rabbitmq_user, password: rabbitmq_passwd, vhost: rabbitmq_vhost)
     @connection.start
   end
 
@@ -34,5 +34,17 @@ class RabbitMQBase
 
   def rabbitmq_host
     ENV.fetch('RABBITMQ_HOST', 'localhost')
+  end
+
+  def rabbitmq_user
+    ENV.fetch('RABBITMQ_USER', 'guest')
+  end
+
+  def rabbitmq_passwd
+    ENV.fetch('RABBITMQ_PASSWD', 'guest')
+  end
+
+  def rabbitmq_vhost
+    ENV.fetch('RABBITMQ_VHOST', '/')
   end
 end
