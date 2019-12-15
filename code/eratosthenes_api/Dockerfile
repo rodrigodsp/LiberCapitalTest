@@ -12,11 +12,12 @@ RUN apt-get update && apt-get install -y \
 RUN echo 'gem: --no-document' > ~/.gemrc
 RUN gem install bundler
 
-ENV APP_HOME /app/
-RUN mkdir $APP_HOME
-WORKDIR $APP_HOME
-COPY Gemfile Gemfile.lock ./
-RUN bundle install --binstubs
-COPY . .
+RUN mkdir /myapp
+WORKDIR /myapp
+COPY Gemfile /myapp/Gemfile
+COPY Gemfile.lock /myapp/Gemfile.lock
+RUN bundle install
+COPY . /myapp
 
-CMD puma -C config/puma.rb
+#CMD puma -C config/puma.rb
+CMD ["rails", "server", "-b", "0.0.0.0"]
