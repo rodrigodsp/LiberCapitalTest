@@ -88,4 +88,104 @@ Para subir as aplicações em ambiente de desenvolvimento:
 	
 	
 (2) Com o Docker:
-*** AINDA NÃO ESTÁ FUNCIONANDO ***
+
+  (i) Ter as seguintes dependências instaladas:
+    - Docker 19.03.5
+    - Docker-Compose 1.17.1
+    - Ruby 2.6.5
+    - RabbitMQ 3.8.1 (instalação padrão)
+    - Redis 4.0.9 (instalação padrão)
+  
+  (ii) Configurar uma rede no Docker para ter acesso à máquina Host (necessário para a API e o Worker terem acesso ao RabbitMQ e Redis):
+    - $ docker network create -d bridge --subnet 192.168.0.0/24 --gateway 192.168.0.1 dockernet
+  
+  (iii) Configurar os acessos no RabbitMQ:
+    - $ rabbitmqctl add_user libercapital t0ps3kret
+    - $ rabbitmqctl add_vhost libercapital
+    - $ rabbitmqctl set_permissions -p libercapital libercapital ".*" ".*" ".*"
+
+  (iv) Configurar o Redis para aceitar conexões remotas:
+    - $ vim '/etc/redis/redis.conf' (editar o arquivo alterando a linha 'bind 127.0.0.1' para 'bind 127.0.0.1 192.168.0.1')
+    - $ /etc/init.d/redis-server stop
+    - $ /etc/init.d/redis-server start
+    
+  (v) Inicializar os workers do RabbitMQ, informando também o número desejado de instâncias do worker:
+    - $ cd code/eratosthenes_rabbitmq
+    - $ docker-compose build
+    - $ docker-compose up --scale worker=NRO_INSTANCIAS
+    
+  (vi) Inicializar a API REST:
+    - $ cd code/eratosthenes_api
+    - $ docker-compose build
+    - $ docker-compose up
+    
+  (vii) Fazer uma requisição de teste:
+    - $ curl -X POST -d '{"values":"5,6,9,11,12"}' -H "Content-Type: application/json" http://localhost:3000/identify_prime_numbers
+    
+    A primeira requisição deverá ter como retorno algo como o que segue:
+    
+          {
+            "request": {
+                "values": "5,6,9,11,12"
+            },
+            "response": {
+                "numbers": [
+                    {
+                        "value": "5",
+                        "prime": null
+                    },
+                    {
+                        "value": "6",
+                        "prime": null
+                    },
+                    {
+                        "value": "9",
+                        "prime": null
+                    },
+                    {
+                        "value": "11",
+                        "prime": null
+                    },
+                    {
+                        "value": "12",
+                        "prime": null
+                    }
+                ]
+            }
+          }
+          
+    O valor retornado em "prime" para cada um dos "numbers" é null devido ao fato de que na primeira requisição o cache do Redis ainda está limpo, pois os números apenas foram colocados na fila do RabbitMQ para aguardar o processamento. Na segunda requisição, os valores já devem começar a aparecer com "true" para números que são primos e "false" para números que não são:
+          
+          {
+            "request": {
+                "values": "5,6,9,11,12"
+            },
+            "response": {
+                "numbers": [
+                    {
+                        "value": "5",
+                        "prime": true
+                    },
+                    {
+                        "value": "6",
+                        "prime": false
+                    },
+                    {
+                        "value": "9",
+                        "prime": false
+                    },
+                    {
+                        "value": "11",
+                        "prime": true
+                    },
+                    {
+                        "value": "12",
+                        "prime": false
+                    }
+                ]
+            }
+          }
+		  
+  (viii) Inicializar e testar o frontend em HTML:
+    - Abrir no browser o arquivo 'index.html' contido no diretório 'code/eratosthenes_api'
+    - Digitar no campo texto uma sequência de números inteiros separados por vírgula e clicar no botão 'Buscar'
